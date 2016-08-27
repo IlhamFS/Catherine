@@ -5,6 +5,7 @@ var sitepage2 = null;
 var phInstance = null;
 var phInstance2 = null;
 var theater_name = 'ARION XXI';
+var result = '';
 phantom.create()
     .then(instance => {
         phInstance = instance;
@@ -19,16 +20,13 @@ phantom.create()
         return sitepage.property('content');
     })
     .then(content => {
-        //console.log(content);
         var $ = cheerio.load(content);
         $('li').each(function(i, element){
           if($(this).parent().prev().text() != 'PLAYING AT Jakarta'){
             var li = $(this);
             if(theater_name == li.text()){
-              console.log(li.children('a').attr('href'));
               show_movies(phInstance, 'http://m.21cineplex.com/' + li.children('a').attr('href'));
             }
-              //show_movies(a.children('a').attr('href'));
           }
         });
 
@@ -52,14 +50,32 @@ function show_movies(ph, url){
       .then(content => {
           var $ = cheerio.load(content);
           $('ol').each(function(i, element){
-            var li = $(this);
-            console.log(li.text());
-
+            var movie_name = $(this);
+            var movie_schedule = $(this).next();
+            var scrap_date = movie_schedule.children('.p_date');
+            var scrap_time = movie_schedule.children('.p_time');
+            var scrap_price = movie_schedule.children('.p_price');
+            result += movie_name.text();
+            var dates = scrap_date.map(function(i, element){
+              return $(this).text();
+            }).get();
+            var times = scrap_time.map(function(i, element){
+              return $(this).text();
+            }).get();
+            var prices = scrap_price.map(function(i, element){
+              return $(this).text();
+            }).get();
+            for(var i = 0; i < dates.length; i++){
+              result += dates[i] + '\n';
+              result += times[i] + '\n';
+              result += prices[i] + '\n\n';
+            }
           });
           sitepage2.close();
           sitepage.close();
           phInstance.exit();
           phInstance2.exit();
+          console.log(result);
       })
       .catch(error => {
           console.log(error);
