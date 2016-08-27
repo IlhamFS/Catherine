@@ -1,5 +1,6 @@
 var phantom = require('phantom');
 var cheerio = require('cheerio');
+var lev = require('fast-levenshtein')
 var sitepage = null;
 var sitepage2 = null;
 var phInstance = null;
@@ -24,6 +25,8 @@ phantom.create()
         $('li').each(function(i, element){
           if($(this).parent().prev().text() != 'PLAYING AT Jakarta'){
             var li = $(this);
+            var l = new Levenshtein(theater_name, li.text());
+            console.log(l.distance);
             if(theater_name == li.text()){
               show_movies(phInstance, 'http://m.21cineplex.com/' + li.children('a').attr('href'));
             }
