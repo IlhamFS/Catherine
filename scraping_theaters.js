@@ -1,12 +1,12 @@
-module.exports = function (dict, callback){
+module.exports = function (callback){
   var phantom = require('phantom');
   var cheerio = require('cheerio');
+  var mymodule = require('./scraping_movies.js')
   var sitepage = null;
-  var sitepage2 = null;
   var phInstance = null;
-  var phInstance2 = null;
   var result = '';
-  var arr = [];
+  var arr_layout = [];
+  var arr_texts = [];
   phantom.create()
       .then(instance => {
           phInstance = instance;
@@ -23,16 +23,16 @@ module.exports = function (dict, callback){
       .then(content => {
           var $ = cheerio.load(content);
           $('li').each(function(i, element){
-            if($(this).parent().prev().text() != 'PLAYING AT Jakarta'){
-              arr.push(1);
+            if($(this).parent().prev().text() == 'ALL THEATERS'){
+              arr_layout.push(1);
               var li = $(this).text();
-              dict[li] = () => {};
+              arr_texts.push(li);
+              result += li + '\n';
             }
           });
           sitepage.close();
           phInstance.exit();
-          dict.layout = arr;
-          callback(null, dict);
+          callback(null, result);
       })
       .catch(error => {
           console.log(error);

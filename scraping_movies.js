@@ -1,4 +1,4 @@
-module.exports = function (theater_name, callback){
+module.exports = function (theater_user, callback){
   var phantom = require('phantom');
   var cheerio = require('cheerio');
   var sitepage = null;
@@ -23,7 +23,7 @@ module.exports = function (theater_name, callback){
       .then(content => {
           var $ = cheerio.load(content);
           $('li').each(function(i, element){
-            if($(this).parent().prev().text() != 'PLAYING AT Jakarta'){
+            if($(this).parent().prev().text() == 'ALL THEATERS'){
               var li = $(this);
               if(theater_name == li.text()){
                 show_movies(phInstance, 'http://m.21cineplex.com/' + li.children('a').attr('href'));
@@ -76,7 +76,7 @@ module.exports = function (theater_name, callback){
             sitepage.close();
             phInstance.exit();
             phInstance2.exit();
-            console.log(result);
+            callback(null, result);
         })
         .catch(error => {
             console.log(error);
